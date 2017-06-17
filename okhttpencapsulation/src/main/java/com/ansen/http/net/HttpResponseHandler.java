@@ -16,7 +16,6 @@ import okhttp3.Response;
  */
 public abstract class HttpResponseHandler implements Callback {
 	public HttpResponseHandler(){
-
 	}
 
 	public void onFailure(Call call, IOException e){
@@ -28,8 +27,7 @@ public abstract class HttpResponseHandler implements Callback {
 		byte[] body = response.body().bytes();
 		if(code>299){
 			onFailure(response.code(),body);
-		}
-		else{
+		}else{
 			Headers headers = response.headers();
 			Header[] hs = new Header[headers.size()];
 
@@ -41,12 +39,10 @@ public abstract class HttpResponseHandler implements Callback {
 	}
 
 	public void onFailure(int status,byte[] data){
-
 	}
 
-	public void onProgress(int bytesWritten, int totalSize) {
-	}
+//	public void onProgress(int bytesWritten, int totalSize) {
+//	}
 
 	public abstract void onSuccess(int statusCode, Header[] headers, byte[] responseBody);
-
 }

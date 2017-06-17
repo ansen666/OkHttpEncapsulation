@@ -12,17 +12,28 @@ import java.util.List;
  * Create Time 2017-06-09
  */
 public class Util {
+    /**
+     * 获取文件名称
+     * @param filename
+     * @return
+     */
     public static String getFileName(String filename){
         int start=filename.lastIndexOf("/");
-        int end=filename.lastIndexOf(".");
-        if(start!=-1 && end!=-1){
-            return filename.substring(start+1,end);
+//        int end=filename.lastIndexOf(".");
+        if(start!=-1){
+            return filename.substring(start+1,filename.length());
         }else{
             return null;
         }
     }
 
-    public static String get(String url, List<NameValuePair> commonField){
+    /**
+     * 拼接公共参数
+     * @param url
+     * @param commonField
+     * @return
+     */
+    public static String getMosaicParameter(String url, List<NameValuePair> commonField){
         if (TextUtils.isEmpty(url))
             return "";
         if (url.contains("?")) {
