@@ -45,6 +45,11 @@ public class Util {
         return url;
     }
 
+    /**
+     *
+     * @param commonField
+     * @return
+     */
     private static String getCommonFieldString(List<NameValuePair> commonField){
         StringBuffer sb = new StringBuffer();
         try{

@@ -12,16 +12,26 @@ import okhttp3.Response;
  * @Description: TODO(HTTP回调类)
  * @author guopeng
  * @date 2014 2014年9月21日 下午5:42:04
- *
  */
 public abstract class HttpResponseHandler implements Callback {
-	public HttpResponseHandler(){
+	public HttpResponseHandler() {
 	}
 
+	/**
+	 *
+	 * @param call
+	 * @param e
+     */
 	public void onFailure(Call call, IOException e){
 		onFailure(-1,e.getMessage().getBytes());
 	}
 
+	/**
+	 *
+	 * @param call
+	 * @param response
+	 * @throws IOException
+     */
 	public void onResponse(Call call, Response response) throws IOException {
 		int code =response.code();
 		byte[] body = response.body().bytes();
