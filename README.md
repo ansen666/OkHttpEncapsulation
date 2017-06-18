@@ -148,4 +148,6 @@ private byte[] getUploadFileBytes(){
 ```
 
 #### 修改公共参数
+```
 HTTPCaller.getInstance().updateCommonField("version_code","2");//更新公共字段版本号的值
+```
