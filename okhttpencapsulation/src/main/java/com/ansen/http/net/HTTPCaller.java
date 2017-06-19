@@ -175,22 +175,20 @@ public class HTTPCaller {
 			MultipartBody.Builder builder = new MultipartBody.Builder();
 			builder.setType(MultipartBody.FORM);
 			MediaType mediaType = MediaType.parse("application/octet-stream");
+
+			form.addAll(httpConfig.getCommonField());//添加公共字段
+
 			for(int i=form.size()-1;i>=0;i--){
 				NameValuePair item = form.get(i);
-				if (item.getName().startsWith("upload_file")){
+				if(item.isFile()){//上传文件
 					File myFile = new File(item.getValue());
 					if (myFile.exists()){
 						String fileName = Util.getFileName(item.getValue());
 						builder.addFormDataPart(item.getName(), fileName,RequestBody.create(mediaType, myFile));
 					}
+				}else{
+					builder.addFormDataPart(item.getName(), item.getValue());
 				}
-				form.remove(i);
-			}
-
-			form.addAll(httpConfig.getCommonField());//添加公共字段
-
-			for (NameValuePair item : form) {
-				builder.addFormDataPart(item.getName(), item.getValue());
 			}
 
 			RequestBody requestBody = builder.build();

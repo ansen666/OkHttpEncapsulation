@@ -1,6 +1,9 @@
 package com.ansen.okhttp.test.activity;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.os.Build;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,6 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private String[] perms = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    private final int PERMS_REQUEST_CODE = 200;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.tv_post).setOnClickListener(this);
         findViewById(R.id.tv_upload_file).setOnClickListener(this);
         findViewById(R.id.tv_upload_file_content).setOnClickListener(this);
+        findViewById(R.id.tv_modify_version).setOnClickListener(this);
     }
 
     @Override
@@ -39,30 +46,58 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             HTTPCaller.getInstance().get(User.class, "http://139.196.35.30:8080/OkHttpTest/getUserInfo.do?per=123", null, requestDataCallback);
         } else if (v.getId() == R.id.tv_post) {
             List<NameValuePair> postParam = new ArrayList<>();
-            postParam.add(new NameValuePair("username", "ansen"));
-            postParam.add(new NameValuePair("password", "123"));
+            postParam.add(new NameValuePair("username","ansen"));
+            postParam.add(new NameValuePair("password","123"));
             HTTPCaller.getInstance().post(User.class, "http://139.196.35.30:8080/OkHttpTest/login.do", null, postParam, requestDataCallback);
         } else if (v.getId() == R.id.tv_upload_file) {
-            List<NameValuePair> postParam = new ArrayList<>();
-            postParam.add(new NameValuePair("username", "ansen"));
-            postParam.add(new NameValuePair("password", "123"));
-            postParam.add(new NameValuePair("upload_file",copyFile()));
-
-            HTTPCaller.getInstance().updateCommonField("version_code","2");//更新公共字段版本号的值
-            HTTPCaller.getInstance().postFile(User.class, "http://139.196.35.30:8080/OkHttpTest/uploadFile.do", null, postParam, requestDataCallback);
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {//Android 6.0以上版本需要获取权限
+                requestPermissions(perms,PERMS_REQUEST_CODE);//请求权限
+            } else {
+                uploadFile();
+            }
         }else if(v.getId()==R.id.tv_upload_file_content){
             byte[] bytes=getUploadFileBytes();//获取文件内容存入byte数组
             HTTPCaller.getInstance().postFile(User.class, "http://139.196.35.30:8080/OkHttpTest/uploadFile.do", null, "upload_file","test.txt",bytes,requestDataCallback);
+        }else if(v.getId()==R.id.tv_modify_version){
+            HTTPCaller.getInstance().updateCommonField("version_code","2");//更新公共字段版本号的值
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int permsRequestCode, String[] permissions, int[] grantResults) {
+        switch (permsRequestCode) {
+            case PERMS_REQUEST_CODE:
+                boolean storageAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                if (storageAccepted) {
+                    uploadFile();
+                } else {
+                    Log.i("MainActivity", "没有权限操作这个请求");
+                }
+                break;
+
         }
     }
 
     private RequestDataCallback requestDataCallback = new RequestDataCallback<User>() {
         @Override
         public void dataCallback(User user) {
-            Log.i("ansen", "获取用户信息:" + user.toString());
+            if(user==null){
+                Log.i("ansen", "请求失败");
+            }else{
+                Log.i("ansen", "获取用户信息:" + user.toString());
+            }
+
         }
     };
 
+    private void uploadFile(){
+        List<NameValuePair> postParam = new ArrayList<>();
+        postParam.add(new NameValuePair("username", "ansen"));
+        postParam.add(new NameValuePair("password", "123"));
+        String filePath=copyFile();//获取文件路径
+        postParam.add(new NameValuePair("upload_file",filePath,true));
+        HTTPCaller.getInstance().postFile(User.class, "http://139.196.35.30:8080/OkHttpTest/uploadFile.do", null, postParam, requestDataCallback);
+    }
 
     private byte[] getUploadFileBytes(){
         byte[] bytes=null;
@@ -79,7 +114,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /**
-     * 如果sdcard没有文件就复制过去
+     * 如果sd卡存在这个文件就先删除
+     * 然后再从assets下把test.txt复制到sd卡上
+     * @return
      */
     private String copyFile() {
         AssetManager assetManager = this.getAssets();

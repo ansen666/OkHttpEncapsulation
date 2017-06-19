@@ -23,6 +23,7 @@ public class MyApplication extends Application{
         httpConfig.addCommonField("pf","android");
         httpConfig.addCommonField("version_code","1");
 
+        //初始化HTTPCaller类
         HTTPCaller.getInstance().setHttpConfig(httpConfig);
     }
 }

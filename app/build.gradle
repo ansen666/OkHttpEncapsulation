@@ -27,4 +27,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.3.1'
     testCompile 'junit:junit:4.12'
     compile project(':okhttpencapsulation')
+//    compile 'com.ansen.http:okhttpencapsulation:1.0.1'
 }
