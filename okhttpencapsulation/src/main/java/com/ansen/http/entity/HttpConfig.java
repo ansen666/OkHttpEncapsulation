@@ -108,7 +108,7 @@ public class HttpConfig {
      */
     public void removeCommonField(String key){
         for(int i=commonField.size()-1;i>=0;i--){
-            if(commonField.get(i).equals("key")){
+            if(commonField.get(i).equals(key)){
                 commonField.remove(i);
             }
         }
