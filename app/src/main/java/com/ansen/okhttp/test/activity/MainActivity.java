@@ -24,6 +24,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.github.lizhangqu.coreprogress.ProgressUIListener;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private String[] perms = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
     private final int PERMS_REQUEST_CODE = 200;
@@ -36,8 +38,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.tv_get).setOnClickListener(this);
         findViewById(R.id.tv_post).setOnClickListener(this);
         findViewById(R.id.tv_upload_file).setOnClickListener(this);
+        findViewById(R.id.tv_upload_file_progress).setOnClickListener(this);
         findViewById(R.id.tv_upload_file_content).setOnClickListener(this);
+        findViewById(R.id.tv_upload_file_content_progress).setOnClickListener(this);
+        findViewById(R.id.tv_download_file).setOnClickListener(this);
         findViewById(R.id.tv_modify_version).setOnClickListener(this);
+
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {//Android 6.0以上版本需要获取权限
+            requestPermissions(perms,PERMS_REQUEST_CODE);//请求权限
+        }
     }
 
     @Override
@@ -50,16 +59,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             postParam.add(new NameValuePair("password","123"));
             HTTPCaller.getInstance().post(User.class, "http://139.196.35.30:8080/OkHttpTest/login.do", null, postParam, requestDataCallback);
         } else if (v.getId() == R.id.tv_upload_file) {
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {//Android 6.0以上版本需要获取权限
-                requestPermissions(perms,PERMS_REQUEST_CODE);//请求权限
-            } else {
-                uploadFile();
-            }
+            updaloadFile(null);
+        }else if (v.getId() == R.id.tv_upload_file_progress) {
+            updaloadFile(new ProgressUIListener(){
+                @Override
+                public void onUIProgressChanged(long numBytes, long totalBytes, float percent, float speed) {
+                    Log.i("ansen","numBytes:"+numBytes+" totalBytes:"+totalBytes+" percent:"+percent+" speed:"+speed);
+                }
+            });
         }else if(v.getId()==R.id.tv_upload_file_content){
             byte[] bytes=getUploadFileBytes();//获取文件内容存入byte数组
             HTTPCaller.getInstance().postFile(User.class, "http://139.196.35.30:8080/OkHttpTest/uploadFile.do", null, "upload_file","test.txt",bytes,requestDataCallback);
+        }else if(v.getId()==R.id.tv_upload_file_content_progress){
+            byte[] bytes=getUploadFileBytes();//获取文件内容存入byte数组
+            HTTPCaller.getInstance().postFile(User.class, "http://139.196.35.30:8080/OkHttpTest/uploadFile.do", null, "upload_file", "test.txt", bytes, requestDataCallback, new ProgressUIListener() {
+                @Override
+                public void onUIProgressChanged(long numBytes, long totalBytes, float percent, float speed) {
+                    Log.i("ansen","upload file content numBytes:"+numBytes+" totalBytes:"+totalBytes+" percent:"+percent+" speed:"+speed);
+                }
+            });
+        }else if(v.getId()==R.id.tv_download_file){//下载文件
+            String newFilePath=Environment.getExternalStorageDirectory() + "/test/test222.txt";
+            HTTPCaller.getInstance().downloadFile("http://139.196.35.30:8080/OkHttpTest/upload/test.txt",newFilePath,null,new ProgressUIListener(){
+                @Override
+                public void onUIProgressChanged(long numBytes, long totalBytes, float percent, float speed) {
+                    Log.i("ansen","dowload file content numBytes:"+numBytes+" totalBytes:"+totalBytes+" percent:"+percent+" speed:"+speed);
+                }
+            });
         }else if(v.getId()==R.id.tv_modify_version){
             HTTPCaller.getInstance().updateCommonField("version_code","2");//更新公共字段版本号的值
+        }
+    }
+
+    private void updaloadFile(ProgressUIListener progressUIListener){
+        List<NameValuePair> postParam = new ArrayList<>();
+        postParam.add(new NameValuePair("username", "ansen"));
+        postParam.add(new NameValuePair("password", "123"));
+        String filePath=copyFile();//获取文件路径
+        postParam.add(new NameValuePair("upload_file",filePath,true));
+        if(progressUIListener==null){//上传文件没有回调进度条
+            HTTPCaller.getInstance().postFile(User.class, "http://139.196.35.30:8080/OkHttpTest/uploadFile.do", null, postParam, requestDataCallback);
+        }else{//上传文件并且回调上传进度
+            HTTPCaller.getInstance().postFile(User.class, "http://139.196.35.30:8080/OkHttpTest/uploadFile.do", null, postParam, requestDataCallback,progressUIListener);
         }
     }
 
@@ -69,9 +110,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case PERMS_REQUEST_CODE:
                 boolean storageAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
                 if (storageAccepted) {
-                    uploadFile();
+
                 } else {
-                    Log.i("MainActivity", "没有权限操作这个请求");
+                    Log.i("MainActivity", "没有写磁盘的判断退出APP");
+                    finish();
                 }
                 break;
 
@@ -86,23 +128,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }else{
                 Log.i("ansen", "获取用户信息:" + user.toString());
             }
-
         }
     };
-
-    private void uploadFile(){
-        List<NameValuePair> postParam = new ArrayList<>();
-        postParam.add(new NameValuePair("username", "ansen"));
-        postParam.add(new NameValuePair("password", "123"));
-        String filePath=copyFile();//获取文件路径
-        postParam.add(new NameValuePair("upload_file",filePath,true));
-        HTTPCaller.getInstance().postFile(User.class, "http://139.196.35.30:8080/OkHttpTest/uploadFile.do", null, postParam, requestDataCallback);
-    }
 
     private byte[] getUploadFileBytes(){
         byte[] bytes=null;
         try {
-            InputStream inputStream = getAssets().open("ansen.txt");
+            InputStream inputStream = getAssets().open("test.txt");
             Log.i("ansen","文件长度:"+inputStream.available());
             bytes = new byte[inputStream.available()];
             inputStream.read(bytes);

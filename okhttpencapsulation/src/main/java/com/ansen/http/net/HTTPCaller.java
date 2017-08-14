@@ -10,6 +10,7 @@ import com.ansen.http.util.Util;
 import com.google.gson.Gson;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,6 +19,8 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.TimeUnit;
 
+import io.github.lizhangqu.coreprogress.ProgressHelper;
+import io.github.lizhangqu.coreprogress.ProgressUIListener;
 import okhttp3.CacheControl;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -27,6 +30,11 @@ import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+import okio.BufferedSink;
+import okio.BufferedSource;
+import okio.Okio;
 
 /**
  * HTTP请求发起和数据解析转换
@@ -149,10 +157,39 @@ public class HTTPCaller {
 	 * @param header 请求头
 	 * @param form 请求参数
 	 * @param callback 回调
+	 * @param <T>
+	 */
+	public <T> void postFile(final Class<T> clazz, final String url, Header[] header,List<NameValuePair> form,final RequestDataCallback<T> callback) {
+		postFile(url, header, form, new MyHttpResponseHandler(clazz,url,callback),null);
+	}
+
+	/**
+	 * 上传文件
+	 * @param clazz json对应类的类型
+	 * @param url 请求url
+	 * @param header 请求头
+	 * @param form 请求参数
+	 * @param callback 回调
+	 * @param progressUIListener  上传文件进度
      * @param <T>
      */
-	public <T> void postFile(final Class<T> clazz, final String url, Header[] header,List<NameValuePair> form,final RequestDataCallback<T> callback) {
-		add(url, postFile(url, header, form, new MyHttpResponseHandler(clazz,url,callback)));
+	public <T> void postFile(final Class<T> clazz, final String url, Header[] header,List<NameValuePair> form,final RequestDataCallback<T> callback,ProgressUIListener progressUIListener) {
+		add(url, postFile(url, header, form, new MyHttpResponseHandler(clazz,url,callback),progressUIListener));
+	}
+
+	/**
+	 * 上传文件
+	 * @param clazz json对应类的类型
+	 * @param url 请求url
+	 * @param header 请求头
+	 * @param name 名字
+	 * @param fileName 文件名
+	 * @param fileContent 文件内容
+	 * @param callback 回调
+	 * @param <T>
+	 */
+	public <T> void postFile(final Class<T> clazz,final String url,Header[] header,String name,String fileName,byte[] fileContent,final RequestDataCallback<T> callback){
+		postFile(clazz,url,header,name,fileName,fileContent,callback,null);
 	}
 
 	/**
@@ -164,13 +201,32 @@ public class HTTPCaller {
 	 * @param fileName 文件名
 	 * @param fileContent 文件内容
      * @param callback 回调
+	 * @param progressUIListener 回调上传进度
      * @param <T>
      */
-	public <T> void postFile(final Class<T> clazz,final String url,Header[] header,String name,String fileName,byte[] fileContent,final RequestDataCallback<T> callback) {
-		add(url,postFile(url, header,name,fileName,fileContent,new MyHttpResponseHandler(clazz,url,callback)));
+	public <T> void postFile(Class<T> clazz,final String url,Header[] header,String name,String fileName,byte[] fileContent,final RequestDataCallback<T> callback,ProgressUIListener progressUIListener) {
+		add(url,postFile(url, header,name,fileName,fileContent,new MyHttpResponseHandler(clazz,url,callback),progressUIListener));
 	}
 
-	private Call postFile(String url, Header[] header,List<NameValuePair> form,HttpResponseHandler responseCallback){
+	public void downloadFile(String url,String saveFilePath, Header[] header,ProgressUIListener progressUIListener) {
+		downloadFile(url,saveFilePath, header, progressUIListener,true);
+	}
+
+	public void downloadFile(String url,String saveFilePath, Header[] header,ProgressUIListener progressUIListener,boolean autoCancel) {
+		if (checkAgent()) {
+			return;
+		}
+		add(url,downloadFileSendRequest(url,saveFilePath, header, progressUIListener),autoCancel);
+	}
+
+	private Call downloadFileSendRequest(String url,final String saveFilePath,Header[] header,final ProgressUIListener progressUIListener){
+		Request.Builder builder = new Request.Builder();
+		builder.url(url);
+		builder.get();
+		return execute(builder, header, new DownloadFileResponseHandler(url,saveFilePath,progressUIListener));
+	}
+
+	private Call postFile(String url, Header[] header,List<NameValuePair> form,HttpResponseHandler responseCallback,ProgressUIListener progressUIListener){
 		try {
 			MultipartBody.Builder builder = new MultipartBody.Builder();
 			builder.setType(MultipartBody.FORM);
@@ -191,7 +247,12 @@ public class HTTPCaller {
 				}
 			}
 
-			RequestBody requestBody = builder.build();
+			RequestBody requestBody;
+			if(progressUIListener==null){//不需要回调进度
+				requestBody=builder.build();
+			}else{//需要回调进度
+				requestBody = ProgressHelper.withProgress(builder.build(),progressUIListener);
+			}
 			Request.Builder requestBuider = new Request.Builder();
 			requestBuider.url(url);
 			requestBuider.post(requestBody);
@@ -205,7 +266,7 @@ public class HTTPCaller {
 		return null;
 	}
 
-	private Call postFile(String url, Header[] header,String name,String filename,byte[] fileContent, HttpResponseHandler responseCallback) {
+	private Call postFile(String url, Header[] header,String name,String filename,byte[] fileContent, HttpResponseHandler responseCallback,ProgressUIListener progressUIListener) {
 		try {
 			MultipartBody.Builder builder = new MultipartBody.Builder();
 			builder.setType(MultipartBody.FORM);
@@ -218,7 +279,12 @@ public class HTTPCaller {
 				builder.addFormDataPart(item.getName(),item.getValue());
 			}
 
-			RequestBody requestBody = builder.build();
+			RequestBody requestBody;
+			if(progressUIListener==null){//不需要回调进度
+				requestBody=builder.build();
+			}else{//需要回调进度
+				requestBody = ProgressHelper.withProgress(builder.build(),progressUIListener);
+			}
 			Request.Builder requestBuider = new Request.Builder();
 			requestBuider.url(url);
 			requestBuider.post(requestBody);
@@ -256,6 +322,46 @@ public class HTTPCaller {
 		return call;
 	}
 
+	public class DownloadFileResponseHandler implements Callback{
+		private String saveFilePath;
+		private ProgressUIListener progressUIListener;
+		private String url;
+
+		public DownloadFileResponseHandler(String url,String saveFilePath,ProgressUIListener progressUIListener){
+			this.url=url;
+			this.saveFilePath=saveFilePath;
+			this.progressUIListener=progressUIListener;
+		}
+
+		@Override
+		public void onFailure(Call call, IOException e) {
+			clear(url);
+			try {
+				printLog(url + " " + -1 + " " + new String(e.getMessage().getBytes(), "utf-8"));
+			} catch (UnsupportedEncodingException encodingException) {
+				encodingException.printStackTrace();
+			}
+		}
+
+		@Override
+		public void onResponse(Call call, Response response) throws IOException {
+			printLog(url + " code:" + response.code());
+			clear(url);
+
+			ResponseBody responseBody = ProgressHelper.withProgress(response.body(),progressUIListener);
+			BufferedSource source = responseBody.source();
+
+			File outFile = new File(saveFilePath);
+			outFile.delete();
+			outFile.createNewFile();
+
+			BufferedSink sink = Okio.buffer(Okio.sink(outFile));
+			source.readAll(sink);
+			sink.flush();
+			source.close();
+		}
+	}
+
 	public class MyHttpResponseHandler<T> extends HttpResponseHandler {
 		private Class<T> clazz;
 		private String url;
@@ -279,13 +385,13 @@ public class HTTPCaller {
 		}
 
 		@Override
-		public void onSuccess(int status,final Header[] header, byte[] data) {
+		public void onSuccess(int status,final Header[] headers, byte[] responseBody) {
 			try {
 				clear(url);
-				String str = new String(data,"utf-8");
+				String str = new String(responseBody,"utf-8");
 				printLog(url + " " + status + " " + str);
 				T t = gson.fromJson(str, clazz);
-				sendCallback(status,t,data,callback);
+				sendCallback(status,t,responseBody,callback);
 			} catch (Exception e){
 				if (httpConfig.isDebug()) {
 					e.printStackTrace();

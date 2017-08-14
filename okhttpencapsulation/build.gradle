@@ -38,6 +38,7 @@ dependencies {
 
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
     compile 'com.google.code.gson:gson:2.7'
+    compile 'io.github.lizhangqu:coreprogress:1.0.2'
 }
 
 // 定义两个链接，下面会用到。

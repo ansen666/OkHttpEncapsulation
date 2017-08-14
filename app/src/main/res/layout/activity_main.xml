@@ -25,13 +25,31 @@
         android:id="@+id/tv_upload_file"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="上传文件"/>
+        android:text="上传文件(提供文件路径)并且可以同时上传普通参数"/>
+
+    <Button
+        android:id="@+id/tv_upload_file_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="上传文件并且回调上传进度"/>
 
     <Button
         android:id="@+id/tv_upload_file_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="上传文件内容"/>
+        android:text="单独上传文件内容(上传byte数组)"/>
+
+    <Button
+        android:id="@+id/tv_upload_file_content_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="单独上传文件内容(上传byte数组)并且回调上传进度"/>
+
+    <Button
+        android:id="@+id/tv_download_file"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="下载文件"/>
 
     <Button
         android:id="@+id/tv_modify_version"
