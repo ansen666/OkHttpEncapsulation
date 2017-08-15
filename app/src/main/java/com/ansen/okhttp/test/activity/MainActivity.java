@@ -79,8 +79,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             });
         }else if(v.getId()==R.id.tv_download_file){//下载文件
-            String newFilePath=Environment.getExternalStorageDirectory() + "/test/test222.txt";
-            HTTPCaller.getInstance().downloadFile("http://139.196.35.30:8080/OkHttpTest/upload/test.txt",newFilePath,null,new ProgressUIListener(){
+            String saveFilePath=Environment.getExternalStorageDirectory() + "/test/test222.txt";
+            HTTPCaller.getInstance().downloadFile("http://139.196.35.30:8080/OkHttpTest/upload/test.txt",saveFilePath,null,new ProgressUIListener(){
                 @Override
                 public void onUIProgressChanged(long numBytes, long totalBytes, float percent, float speed) {
                     Log.i("ansen","dowload file content numBytes:"+numBytes+" totalBytes:"+totalBytes+" percent:"+percent+" speed:"+speed);
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         List<NameValuePair> postParam = new ArrayList<>();
         postParam.add(new NameValuePair("username", "ansen"));
         postParam.add(new NameValuePair("password", "123"));
-        String filePath=copyFile();//获取文件路径
+        String filePath=copyFile();//复制一份文件到sdcard上，并且获取文件路径
         postParam.add(new NameValuePair("upload_file",filePath,true));
         if(progressUIListener==null){//上传文件没有回调进度条
             HTTPCaller.getInstance().postFile(User.class, "http://139.196.35.30:8080/OkHttpTest/uploadFile.do", null, postParam, requestDataCallback);

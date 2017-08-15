@@ -74,7 +74,7 @@ install {
                     developer {
                         id 'ansen' // 开发者的id。
                         name 'ansen' // 开发者名字。
-                        email 'privateworkemail@163.com' // 开发者邮箱。
+                        email 'iprivateworkemail@gmail.com' // 开发者邮箱。
                     }
                 }
 
@@ -122,9 +122,9 @@ bintray {
 
     configurations = ['archives']
     pkg {
-        repo = "maven"  //Repository名字  需要自己在bintray网站上先添加
-        name = "okhttpencapsulation"// 发布到Bintray上的项目名字，这里的名字不是compile 'com.yanzhenjie:andserver:1.0.1'中的andserver。
-        userOrg = 'ansen'// Bintray的组织id
+        repo = "okhttpencapsulation"  //Repository名字  需要自己在bintray网站上先添加
+        name = "okhttpencapsulation"// 发布到Bintray上的项目名字，这里的名字不是compile 'com.ansen.library:circleimage:1.0.1'中的circleimage。
+        userOrg = 'anhui'//Bintray的组织id
         websiteUrl = siteUrl
         vcsUrl = gitUrl
         licenses = ["Apache-2.0"]
