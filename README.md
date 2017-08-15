@@ -12,7 +12,7 @@ http请求基本上每一个app都会使用，进行好的封装提供Activity�
 - 上传文件跟下载文件支持进度回调。
 
 ### 使用
-##### 1.依赖
+#### 1.依赖
 如果是android studio开发支持在线依赖:
 ```
 compile 'com.ansen.http:okhttpencapsulation:1.0.1'
@@ -20,7 +20,7 @@ compile 'com.ansen.http:okhttpencapsulation:1.0.1'
 
 如果是eclipse那你先把ide切换到android studio吧。。。不闲麻烦的话也可以把源码module的源码copy出来，反正也就几个类。
 
-##### 2.初始化HTTPCaller类
+#### 2.初始化HTTPCaller类
 初始化的工作可以放Application，新建MyApplication类继承Application。初始化的时候通过HttpConfig设置一些参数，也可以添加公共参数。
 ```
 public class MyApplication extends Application{
@@ -45,7 +45,7 @@ public class MyApplication extends Application{
 
 因为自定义Application，需要给AndroidManifest.xml文件application标签中的android:name属性赋值，指定自己重写的MyApplication。
 
-#### get请求
+#### 发送get请求
 发送get请求就一行代码。
 ```
 HTTPCaller.getInstance().get(User.class, "http://139.196.35.30:8080/OkHttpTest/getUserInfo.do?per=123", null, requestDataCallback);
@@ -67,7 +67,7 @@ private RequestDataCallback requestDataCallback = new RequestDataCallback<User>(
     };
 ```
 
-#### post请求
+#### 发送post请求
 post请求参数不是跟在url后面的，所以需要把请求参数放到集合里面。因为登录接口也是返回的用户信息，所以可以跟get请求用同一回调。
 ```
 List<NameValuePair> postParam = new ArrayList<>();
