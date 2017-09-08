@@ -36,19 +36,17 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:25.3.1'
 
-    compile 'com.squareup.okhttp3:okhttp:3.2.0'
-    compile 'com.google.code.gson:gson:2.7'
-    compile 'io.github.lizhangqu:coreprogress:1.0.2'
+    compile 'com.squareup.okhttp3:okhttp:3.2.0' //okhttp
+    compile 'com.google.code.gson:gson:2.7' //解析jsons数据
+    compile 'io.github.lizhangqu:coreprogress:1.0.2' //上传下载回调监听
 }
 
 // 定义两个链接，下面会用到。
 def siteUrl = 'https://github.com/ansen666/OkHttpEncapsulation' // 项目主页。
 def gitUrl = 'https://github.com/ansen666/OkHttpEncapsulation.git' // Git仓库的url。
 
-// 唯一包名，比如compile 'com.ansen.http:circleimage:1.0'中的com.ansen.library就是这里配置的。
-group = "com.ansen.http"
-//项目引用的版本号，比如compile 'com.ansen.library:circleimage:1.0.1'中的1.0就是这里配置的。
-version = "1.0.1"
+group = "com.ansen.http"// 唯一包名,比如compile 'com.ansen.http:okhttpencapsulation:1.0.1'中的com.ansen.http就是这里配置的。
+version = "1.0.1"//项目引用的版本号，比如compile 'com.ansen.http:okhttpencapsulation:1.0.1'中的1.0.1就是这里配置的。
 
 install {
     repositories.mavenInstaller {
@@ -58,7 +56,7 @@ install {
                 packaging 'aar'
                 // 项目描述，复制我的话，这里需要修改。
                 name 'okhttpencapsulation'// 可选，项目名称。
-                description 'okhttp'// 可选，项目描述。
+                description 'okhttp project describe'// 可选，项目描述。
                 url siteUrl // 项目主页，这里是引用上面定义好。
 
                 // 软件开源协议，现在一般都是Apache License2.0吧，复制我的，这里不需要修改。
@@ -122,7 +120,7 @@ bintray {
 
     configurations = ['archives']
     pkg {
-        repo = "okhttpencapsulation"  //Repository名字  需要自己在bintray网站上先添加
+        repo = "okhttpencapsulation"  //Repository名字 需要自己在bintray网站上先添加
         name = "okhttpencapsulation"// 发布到Bintray上的项目名字，这里的名字不是compile 'com.ansen.library:circleimage:1.0.1'中的circleimage。
         userOrg = 'anhui'//Bintray的组织id
         websiteUrl = siteUrl
