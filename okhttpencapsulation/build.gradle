@@ -1,9 +1,5 @@
 apply plugin: 'com.android.library'
 
-// 这里添加下面两行代码。
-apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'com.jfrog.bintray'
-
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
@@ -40,6 +36,10 @@ dependencies {
     compile 'com.google.code.gson:gson:2.7' //解析jsons数据
     compile 'io.github.lizhangqu:coreprogress:1.0.2' //上传下载回调监听
 }
+
+// 这里添加下面两行代码。
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
 
 // 定义两个链接，下面会用到。
 def siteUrl = 'https://github.com/ansen666/OkHttpEncapsulation' // 项目主页。
@@ -115,8 +115,8 @@ artifacts {
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 bintray {
-    user = properties.getProperty("bintray.user") // Bintray的用户名。
-    key = properties.getProperty("bintray.apikey") // Bintray刚才保存的ApiKey。
+    user = properties.getProperty("bintray.user")// Bintray的用户名。
+    key = properties.getProperty("bintray.apikey")//Bintray刚才保存的ApiKey。
 
     configurations = ['archives']
     pkg {
