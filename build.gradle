@@ -3,6 +3,12 @@
 buildscript {
     repositories {
         jcenter()
+
+
+//        maven {
+//            name "aliyunmaven"
+//            url "http://maven.aliyun.com/nexus/content/groups/public/"
+//        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.3'
@@ -18,8 +24,14 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+
+//        maven {
+//            name "aliyunmaven"
+//            url "http://maven.aliyun.com/nexus/content/groups/public/"
+//        }
     }
 }
+
 
 task clean(type: Delete) {
     delete rootProject.buildDir
