@@ -26,15 +26,15 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.3.1'
 
-    compile 'com.squareup.okhttp3:okhttp:3.2.0' //okhttp
-    compile 'com.google.code.gson:gson:2.7' //解析jsons数据
-    compile 'io.github.lizhangqu:coreprogress:1.0.2' //上传下载回调监听
+    implementation 'com.android.support:appcompat-v7:25.3.1'
+    api 'com.squareup.okhttp3:okhttp:3.2.0' //okhttp
+    implementation 'com.google.code.gson:gson:2.7' //解析jsons数据
+    api 'io.github.lizhangqu:coreprogress:1.0.2' //上传下载回调监听
 }
 
 // 这里添加下面两行代码。
@@ -46,7 +46,7 @@ def siteUrl = 'https://github.com/ansen666/OkHttpEncapsulation' // 项目主页�
 def gitUrl = 'https://github.com/ansen666/OkHttpEncapsulation.git' // Git仓库的url。
 
 group = "com.ansen.http"// 唯一包名,比如compile 'com.ansen.http:okhttpencapsulation:1.0.1'中的com.ansen.http就是这里配置的。
-version = "1.0.1"//项目引用的版本号，比如compile 'com.ansen.http:okhttpencapsulation:1.0.1'中的1.0.1就是这里配置的。
+version = "1.0.2"//项目引用的版本号，比如compile 'com.ansen.http:okhttpencapsulation:1.0.1'中的1.0.1就是这里配置的。
 
 install {
     repositories.mavenInstaller {

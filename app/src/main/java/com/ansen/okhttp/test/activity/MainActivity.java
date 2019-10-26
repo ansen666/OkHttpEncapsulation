@@ -52,12 +52,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.tv_get) {
-            HTTPCaller.getInstance().get(User.class, "http://139.196.35.30:8080/OkHttpTest/getUserInfo.do?per=123", null, requestDataCallback);
+            HTTPCaller.getInstance().get(User.class, "http://139.196.35.30:8080/OkHttpTest/getUserInfo.do?per=123", requestDataCallback);
         } else if (v.getId() == R.id.tv_post) {
             List<NameValuePair> postParam = new ArrayList<>();
             postParam.add(new NameValuePair("username","ansen"));
             postParam.add(new NameValuePair("password","123"));
-            HTTPCaller.getInstance().post(User.class, "http://139.196.35.30:8080/OkHttpTest/login.do", null, postParam, requestDataCallback);
+            HTTPCaller.getInstance().post(User.class, "http://139.196.35.30:8080/OkHttpTest/login.do", postParam, requestDataCallback);
         } else if (v.getId() == R.id.tv_upload_file) {
             updaloadFile(null);
         }else if (v.getId() == R.id.tv_upload_file_progress) {

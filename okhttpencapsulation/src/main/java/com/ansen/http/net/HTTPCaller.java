@@ -79,6 +79,10 @@ public class HTTPCaller {
 		cacheControl =new CacheControl.Builder().noStore().noCache().build();//不使用缓存
 	}
 
+	public <T> void get(Class<T> clazz,final String url,final RequestDataCallback<T> callback) {
+		this.get(clazz,url,null,callback,true);
+	}
+
 	public <T> void get(Class<T> clazz,final String url,Header[] header,final RequestDataCallback<T> callback) {
 		this.get(clazz,url,header,callback,true);
 	}
@@ -107,7 +111,11 @@ public class HTTPCaller {
 		return execute(builder, header, responseCallback);
 	}
 
-	public <T> void post(final Class<T> clazz,final String url, Header[] header, List<NameValuePair> params, final RequestDataCallback<T> callback) {
+	public <T> void post(final Class<T> clazz,final String url, List<NameValuePair> params, RequestDataCallback<T> callback) {
+		this.post(clazz,url, null, params, callback,true);
+	}
+
+	public <T> void post(final Class<T> clazz,final String url, Header[] header, List<NameValuePair> params, RequestDataCallback<T> callback) {
 		this.post(clazz,url, header, params, callback,true);
 	}
 
