@@ -5,10 +5,11 @@ import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Environment;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.ansen.http.net.NameValuePair;
 import com.ansen.okhttp.test.R;
@@ -36,7 +37,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         findViewById(R.id.tv_get).setOnClickListener(this);
+        findViewById(R.id.tv_get_sync).setOnClickListener(this);
         findViewById(R.id.tv_post).setOnClickListener(this);
+        findViewById(R.id.tv_post_sync).setOnClickListener(this);
         findViewById(R.id.tv_upload_file).setOnClickListener(this);
         findViewById(R.id.tv_upload_file_progress).setOnClickListener(this);
         findViewById(R.id.tv_upload_file_content).setOnClickListener(this);
@@ -53,12 +56,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         if (v.getId() == R.id.tv_get) {
             HTTPCaller.getInstance().get(User.class, "http://139.196.35.30:8080/OkHttpTest/getUserInfo.do?per=123", requestDataCallback);
-        } else if (v.getId() == R.id.tv_post) {
+        } else if(v.getId()==R.id.tv_get_sync){
+            getSync();
+        }else if (v.getId() == R.id.tv_post) {
             List<NameValuePair> postParam = new ArrayList<>();
             postParam.add(new NameValuePair("username","ansen"));
             postParam.add(new NameValuePair("password","123"));
             HTTPCaller.getInstance().post(User.class, "http://139.196.35.30:8080/OkHttpTest/login.do", postParam, requestDataCallback);
-        } else if (v.getId() == R.id.tv_upload_file) {
+        } else if(v.getId()==R.id.tv_post_sync){
+            postSync();
+        }else if (v.getId() == R.id.tv_upload_file) {
             updaloadFile(null);
         }else if (v.getId() == R.id.tv_upload_file_progress) {
             updaloadFile(new ProgressUIListener(){
@@ -174,5 +181,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.e("tag", e.getMessage());
         }
         return newFilePath;
+    }
+
+
+    //在Android中UI线程是不能访问网络的，如果是同步请求网络，需要放在子线程中
+    private void getSync(){
+        new Thread(){
+            @Override
+            public void run() {
+                User user=HTTPCaller.getInstance().getSync(User.class,"http://139.196.35.30:8080/OkHttpTest/getUserInfo.do?per=123");
+                Log.i("ansen","get sync 用户name:"+user.getUsername());
+            }
+        }.start();
+    }
+
+    private void postSync(){
+        new Thread(){
+            @Override
+            public void run() {
+                List<NameValuePair> postParam = new ArrayList<>();
+                postParam.add(new NameValuePair("username","ansen"));
+                postParam.add(new NameValuePair("password","123"));
+                User user=HTTPCaller.getInstance().postSync(User.class,"http://139.196.35.30:8080/OkHttpTest/login.do",postParam);
+                Log.i("ansen","post sync 用户name:"+user.getUsername());
+            }
+        }.start();
     }
 }

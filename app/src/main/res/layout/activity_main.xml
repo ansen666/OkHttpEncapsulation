@@ -16,10 +16,22 @@
         android:text="get请求"/>
 
     <Button
+        android:id="@+id/tv_get_sync"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="get请求同步"/>
+
+    <Button
         android:id="@+id/tv_post"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Post请求"/>
+
+    <Button
+        android:id="@+id/tv_post_sync"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Post请求同步"/>
 
     <Button
         android:id="@+id/tv_upload_file"

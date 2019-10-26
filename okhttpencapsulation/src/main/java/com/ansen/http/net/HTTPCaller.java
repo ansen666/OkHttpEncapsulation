@@ -111,6 +111,30 @@ public class HTTPCaller {
 		return execute(builder, header, responseCallback);
 	}
 
+	public <T> T getSync(Class<T> clazz, String url){
+		return getSync(clazz,url,null);
+	}
+
+	public <T> T getSync(Class<T> clazz, String url, Header[] header) {
+		if (checkAgent()) {
+			return null;
+		}
+		Request.Builder builder = new Request.Builder();
+		builder.url(url);
+		builder.get();
+		byte[] bytes = execute(builder,header);
+		try {
+			String str = new String(bytes, "utf-8");
+			if (clazz != null) {
+				T t = gson.fromJson(str, clazz);
+				return t;
+			}
+		} catch (Exception e) {
+			printLog("getSync HTTPCaller:" + e.toString());
+		}
+		return null;
+	}
+
 	public <T> void post(final Class<T> clazz,final String url, List<NameValuePair> params, RequestDataCallback<T> callback) {
 		this.post(clazz,url, null, params, callback,true);
 	}
@@ -136,26 +160,65 @@ public class HTTPCaller {
 		add(url,postBuilder(url, header, params, new MyHttpResponseHandler(clazz,url,callback)),autoCancel);
 	}
 
+	public <T> T postSync(Class<T> clazz, String url, List<NameValuePair> form) {
+		return postSync(clazz,url,form,null);
+	}
+
+	public <T> T postSync(Class<T> clazz, String url, List<NameValuePair> form,Header[] header) {
+		if (checkAgent()) {
+			return null;
+		}
+		Request.Builder builder=getRequestBuild(url,form);
+		byte[] bytes = execute(builder,header);
+		try {
+			String result = new String(bytes, "utf-8");
+			if (clazz != null && !TextUtils.isEmpty(result)) {
+				T t = gson.fromJson(result,clazz);
+				return t;
+			}
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public byte[] postSync(String url,List<NameValuePair> form){
+		return postSync(url,form);
+	}
+
+	public byte[] postSync(String url,List<NameValuePair> form,Header[] header) {
+		if (checkAgent()) {
+			return null;
+		}
+		Request.Builder builder=getRequestBuild(url,form);
+		return execute(builder, header);
+	}
+
 	private Call postBuilder(String url, Header[] header, List<NameValuePair> form, HttpResponseHandler responseCallback) {
 		try {
-			if (form == null) {
-				form = new ArrayList<>(2);
-			}
-			form.addAll(httpConfig.getCommonField());//添加公共字段
-			FormBody.Builder formBuilder = new FormBody.Builder();
-			for (NameValuePair item : form) {
-				formBuilder.add(item.getName(), item.getValue());
-			}
-			RequestBody requestBody = formBuilder.build();
-			Request.Builder builder = new Request.Builder();
-			builder.url(url);
-			builder.post(requestBody);
+			Request.Builder builder=getRequestBuild(url,form);
 			return execute(builder, header, responseCallback);
 		} catch (Exception e) {
 			if (responseCallback != null)
 				responseCallback.onFailure(-1, e.getMessage().getBytes());
 		}
 		return null;
+	}
+
+	private Request.Builder getRequestBuild(String url,List<NameValuePair> form){
+		if(form==null){
+			form=new ArrayList<>();
+		}
+		form.addAll(httpConfig.getCommonField());//添加公共字段
+		FormBody.Builder formBuilder = new FormBody.Builder();
+		for (NameValuePair item : form) {
+			formBuilder.add(item.getName(), item.getValue());
+		}
+		RequestBody requestBody = formBuilder.build();
+		Request.Builder builder = new Request.Builder();
+		builder.url(url);
+		builder.post(requestBody);
+		return builder;
 	}
 
 	/**
@@ -308,7 +371,29 @@ public class HTTPCaller {
 		return null;
 	}
 
+	//异步执行
 	private Call execute(Request.Builder builder, Header[] header, Callback responseCallback) {
+		Call call = getCall(builder, header);
+		if (call != null) {
+			call.enqueue(responseCallback);
+		}
+		return call;
+	}
+
+	//同步执行
+	private byte[] execute(Request.Builder builder, Header[] header) {
+		Call call = getCall(builder, header);
+		byte[] body = "".getBytes();
+		try {
+			Response response = call.execute();
+			body = response.body().bytes();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return body;
+	}
+
+	private Call getCall(Request.Builder builder, Header[] header) {
 		boolean hasUa = false;
 		if (header == null) {
 			builder.header("Connection","close");
@@ -325,9 +410,7 @@ public class HTTPCaller {
 			builder.header("User-Agent",httpConfig.getUserAgent());
 		}
 		Request request = builder.cacheControl(cacheControl).build();
-		Call call = client.newCall(request);
-		call.enqueue(responseCallback);
-		return call;
+		return client.newCall(request);
 	}
 
 	public class DownloadFileResponseHandler implements Callback{
