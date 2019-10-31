@@ -119,6 +119,7 @@ public class HTTPCaller {
 		if (checkAgent()) {
 			return null;
 		}
+		url=Util.getMosaicParameter(url,httpConfig.getCommonField());//拼接公共参数
 		Request.Builder builder = new Request.Builder();
 		builder.url(url);
 		builder.get();
