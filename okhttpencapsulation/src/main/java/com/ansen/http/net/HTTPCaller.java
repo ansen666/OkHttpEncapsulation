@@ -105,6 +105,7 @@ public class HTTPCaller {
 
 	private Call getBuilder(String url, Header[] header, HttpResponseHandler responseCallback) {
 		url=Util.getMosaicParameter(url,httpConfig.getCommonField());//拼接公共参数
+//		Log.i("ansen","访问的url"+url);
 		Request.Builder builder = new Request.Builder();
 		builder.url(url);
 		builder.get();
@@ -169,6 +170,7 @@ public class HTTPCaller {
 		if (checkAgent()) {
 			return null;
 		}
+//		Log.i("ansen","url:"+url);
 		Request.Builder builder=getRequestBuild(url,form);
 		byte[] bytes = execute(builder,header);
 		try {
@@ -213,7 +215,11 @@ public class HTTPCaller {
 		form.addAll(httpConfig.getCommonField());//添加公共字段
 		FormBody.Builder formBuilder = new FormBody.Builder();
 		for (NameValuePair item : form) {
-			formBuilder.add(item.getName(), item.getValue());
+			if(TextUtils.isEmpty(item.getValue())){
+				printLog("字段:"+item.getName()+"的值为null");
+				continue;
+			}
+			formBuilder.add(item.getName(),item.getValue());
 		}
 		RequestBody requestBody = formBuilder.build();
 		Request.Builder builder = new Request.Builder();
