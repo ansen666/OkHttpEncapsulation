@@ -15,7 +15,7 @@ http请求基本上每一个app都会使用，进行好的封装提供Activity�
 #### 1.依赖
 如果是android studio开发支持在线依赖:
 ```
-compile 'com.ansen.http:okhttpencapsulation:1.0.1'
+compile 'com.ansen.http:okhttpencapsulation:1.0.5'
 ```
 
 如果是eclipse那你先把ide切换到android studio吧。。。不闲麻烦的话也可以把源码module的源码copy出来，反正也就几个类。
