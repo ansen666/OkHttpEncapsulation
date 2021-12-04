@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/OkHttpEncapsulation.iml" filepath="$PROJECT_DIR$/OkHttpEncapsulation.iml" group="OkHttpEncapsulation" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="OkHttpEncapsulation/app" />
-      <module fileurl="file://$PROJECT_DIR$/okhttpencapsulation/okhttpencapsulation.iml" filepath="$PROJECT_DIR$/okhttpencapsulation/okhttpencapsulation.iml" group="OkHttpEncapsulation/okhttpencapsulation" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/OkHttpEncapsulation.iml" filepath="$PROJECT_DIR$/.idea/modules/OkHttpEncapsulation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/OkHttpEncapsulation.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/OkHttpEncapsulation.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/okhttpencapsulation/OkHttpEncapsulation.okhttpencapsulation.iml" filepath="$PROJECT_DIR$/.idea/modules/okhttpencapsulation/OkHttpEncapsulation.okhttpencapsulation.iml" />
     </modules>
   </component>
 </project>
