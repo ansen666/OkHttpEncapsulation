@@ -19,7 +19,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.1.0'
 
-    api 'com.squareup.okhttp3:okhttp:4.7.2' //okhttp
+    api 'com.squareup.okhttp3:okhttp:4.9.3' //okhttp
     api 'com.google.code.gson:gson:2.8.6' //解析jsons数据
     api 'io.github.lizhangqu:coreprogress:1.0.2' //上传下载回调监听
 }
